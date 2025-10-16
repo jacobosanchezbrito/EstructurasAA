@@ -1,0 +1,303 @@
+// ============================================================
+// Clase: ListaCircularDoblementeEnlazada
+// Descripción: Implementa una lista doblemente enlazada circular.
+// Autor: Jacobo
+// ============================================================
+
+public class ListaCircularDoblementeEnlazada {
+
+    // ============================================================
+    // Clase interna Nodo
+    // ============================================================
+    private static class Nodo {
+        int valor;
+        Nodo anterior;
+        Nodo siguiente;
+
+        public Nodo(int valor) {
+            this.valor = valor;
+        }
+    }
+
+    // ============================================================
+    // Atributos principales
+    // ============================================================
+    private Nodo cabeza;
+    private int cantidad;
+
+    // ============================================================
+    // Constructor
+    // ============================================================
+    // O(1)
+    public ListaCircularDoblementeEnlazada() {
+        cabeza = null;
+        cantidad = 0;
+    }
+
+    // ============================================================
+    // Eliminar toda la lista
+    // ============================================================
+    // O(1)
+    public void eliminar() {
+        cabeza = null;
+        cantidad = 0;
+    }
+
+    // ============================================================
+    // Verifica si está vacía
+    // ============================================================
+    // O(1)
+    public boolean estaVacia() {
+        return cabeza == null;
+    }
+
+    // ============================================================
+    // Devuelve cantidad de nodos
+    // ============================================================
+    // O(1)
+    public int getCantidadNodos() {
+        return cantidad;
+    }
+
+    // ============================================================
+    // Insertar al final
+    // ============================================================
+    // O(1)
+    public void insertarFinal(int valor) {
+        Nodo nuevo = new Nodo(valor);
+        if (estaVacia()) {
+            cabeza = nuevo;
+            cabeza.siguiente = cabeza;
+            cabeza.anterior = cabeza;
+        } else {
+            Nodo cola = cabeza.anterior;
+            cola.siguiente = nuevo;
+            nuevo.anterior = cola;
+            nuevo.siguiente = cabeza;
+            cabeza.anterior = nuevo;
+        }
+        cantidad++;
+    }
+
+    // ============================================================
+    // Insertar al inicio
+    // ============================================================
+    // O(1)
+    public void insertarInicio(int valor) {
+        insertarFinal(valor);
+        cabeza = cabeza.anterior; // El nuevo último se convierte en la nueva cabeza
+    }
+
+    // ============================================================
+    // Insertar en una posición
+    // ============================================================
+    // O(n)
+    public void insertarEnPosicion(int posicion, int valor) {
+        if (posicion < 0 || posicion > cantidad)
+            throw new IndexOutOfBoundsException("Posición inválida");
+
+        if (posicion == 0) {
+            insertarInicio(valor);
+            return;
+        }
+
+        if (posicion == cantidad) {
+            insertarFinal(valor);
+            return;
+        }
+
+        Nodo nuevo = new Nodo(valor);
+        Nodo actual = cabeza;
+
+        for (int i = 0; i < posicion; i++) {
+            actual = actual.siguiente;
+        }
+
+        Nodo anterior = actual.anterior;
+        anterior.siguiente = nuevo;
+        nuevo.anterior = anterior;
+        nuevo.siguiente = actual;
+        actual.anterior = nuevo;
+
+        cantidad++;
+    }
+
+    // ============================================================
+    // Obtener valor en posición
+    // ============================================================
+    // O(n)
+    public Object getValor(int posicion) {
+        if (posicion < 0 || posicion >= cantidad)
+            throw new IndexOutOfBoundsException("Posición inválida");
+
+        Nodo actual = cabeza;
+        for (int i = 0; i < posicion; i++) {
+            actual = actual.siguiente;
+        }
+        return actual.valor;
+    }
+
+    // ============================================================
+    // Buscar un valor
+    // ============================================================
+    // O(n)
+    public boolean buscar(Object referencia) {
+        if (estaVacia()) return false;
+
+        Nodo actual = cabeza;
+        do {
+            if (actual.valor == (int) referencia)
+                return true;
+            actual = actual.siguiente;
+        } while (actual != cabeza);
+
+        return false;
+    }
+
+    // ============================================================
+    // Obtener posición de un valor
+    // ============================================================
+    // O(n)
+    public int getPosicion(Object referencia) {
+        if (estaVacia()) return -1;
+
+        Nodo actual = cabeza;
+        int index = 0;
+
+        do {
+            if (actual.valor == (int) referencia)
+                return index;
+            actual = actual.siguiente;
+            index++;
+        } while (actual != cabeza);
+
+        return -1;
+    }
+
+    // ============================================================
+    // Remover por posición
+    // ============================================================
+    // O(n)
+    public void removerPorPosicion(int posicion) {
+        if (posicion < 0 || posicion >= cantidad)
+            throw new IndexOutOfBoundsException("Posición inválida");
+
+        if (cantidad == 1) {
+            cabeza = null;
+        } else if (posicion == 0) {
+            Nodo cola = cabeza.anterior;
+            cabeza = cabeza.siguiente;
+            cabeza.anterior = cola;
+            cola.siguiente = cabeza;
+        } else {
+            Nodo actual = cabeza;
+            for (int i = 0; i < posicion; i++) {
+                actual = actual.siguiente;
+            }
+            actual.anterior.siguiente = actual.siguiente;
+            actual.siguiente.anterior = actual.anterior;
+            if (actual == cabeza.anterior) {
+                cabeza.anterior = actual.anterior;
+            }
+        }
+        cantidad--;
+    }
+
+    // ============================================================
+    // Imprimir lista
+    // ============================================================
+    // O(n)
+    public void imprimir() {
+        if (estaVacia()) {
+            System.out.println("[ Lista vacía ]");
+            return;
+        }
+
+        Nodo actual = cabeza;
+        System.out.print("[ ");
+        do {
+            System.out.print(actual.valor + " ");
+            actual = actual.siguiente;
+        } while (actual != cabeza);
+        System.out.println("]");
+    }
+
+    // ============================================================
+    // Inserción final recursiva
+    // ============================================================
+    // O(n)
+    public void insertarFinalRecursivo(int valor) {
+        if (estaVacia()) {
+            insertarFinal(valor);
+        } else {
+            insertarFinalRecursivoAux(cabeza, valor);
+        }
+    }
+
+    private void insertarFinalRecursivoAux(Nodo nodo, int valor) {
+        if (nodo.siguiente == cabeza) {
+            Nodo nuevo = new Nodo(valor);
+            nuevo.siguiente = cabeza;
+            nuevo.anterior = nodo;
+            nodo.siguiente = nuevo;
+            cabeza.anterior = nuevo;
+            cantidad++;
+        } else {
+            insertarFinalRecursivoAux(nodo.siguiente, valor);
+        }
+    }
+
+    // ============================================================
+    // Inserción inicio recursiva
+    // ============================================================
+    // O(1)
+    public void insertarInicioRecursivo(int valor) {
+        insertarInicio(valor);
+    }
+
+    // ============================================================
+    // Inserción en posición recursiva
+    // ============================================================
+    // O(n)
+    public void insertarEnPosicionRecursivo(int posicion, int valor) {
+        if (posicion < 0 || posicion > cantidad)
+            throw new IndexOutOfBoundsException("Posición inválida");
+
+        if (posicion == 0) {
+            insertarInicio(valor);
+            return;
+        }
+
+        cabeza = insertarEnPosRecursivoAux(cabeza, posicion, valor);
+        cantidad++;
+    }
+
+    private Nodo insertarEnPosRecursivoAux(Nodo nodo, int posicion, int valor) {
+        if (posicion == 1) {
+            Nodo nuevo = new Nodo(valor);
+            nuevo.siguiente = nodo.siguiente;
+            nuevo.anterior = nodo;
+            nodo.siguiente.anterior = nuevo;
+            nodo.siguiente = nuevo;
+        } else {
+            insertarEnPosRecursivoAux(nodo.siguiente, posicion - 1, valor);
+        }
+        return nodo;
+    }
+
+    // ============================================================
+    // Búsqueda recursiva
+    // ============================================================
+    // O(n)
+    public boolean buscarRecursivo(Object referencia) {
+        if (estaVacia()) return false;
+        return buscarRecursivoAux(cabeza, referencia, cabeza);
+    }
+
+    private boolean buscarRecursivoAux(Nodo nodo, Object referencia, Nodo inicio) {
+        if (nodo == null) return false;
+        if (nodo.valor == (int) referencia) return true;
+        if (nodo.siguiente == inicio) return false;
+        return buscarRecursivoAux(nodo.siguiente, referencia, inicio);
+    }
+}
